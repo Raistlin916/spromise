@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+	<script src="promise.js"></script>
+  <script src="q.js"></script>
+</head>
+<body>
+	<script>
+    var d = sp.defer();
+    
+    d.promise.then(function(x){
+      return {
+        then: function(res){
+          setTimeout(function(){
+            res(x);
+          }, 1000)
+          console.log(x, 1);
+        }
+      }
+    }).then(function(x){
+      console.log(x, 2);
+    });
+
+   
+
+  </script>
+</body>
+</html>
