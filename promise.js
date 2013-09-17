@@ -1,27 +1,4 @@
 "use strict";
-/*call: function(data){
-      var d = this.defer();
-      d.resolve(data);
-      return d.promise;
-    },
-    waterfall: function(ps){
-      return ps.reduce(function(n, u){
-          return n.then(u);
-        }, this.call());
-    },
-    all: function(ps){
-      var l = ps.length, results = [], d = this.defer();
-      ps.forEach(function(p, n){
-        p().then(function(r){
-          results[n] = r;
-          d.notify(r);
-          if(!--l) {
-            d.resolve(results);
-          }
-        });
-      });
-      return d.promise;
-    },*/
 
 (function(exports){
   var mapping = ['resolve', 'reject'];
