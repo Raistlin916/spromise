@@ -119,13 +119,22 @@ describe('defer', function(){
         });
       });
       describe('onFulfilled or onRejected must be called', function(){
-        it('not until the execution context stack contains only platform code', function(done){
+        it('not until the execution context stack contains only platform code(before)', function(done){
           d.resolve();
           d.promise.then(function(arg){
             count++;
             expect(count).to.equal(2);
             done();
           });
+          count++;
+        });
+        it('not until the execution context stack contains only platform code(after)', function(done){
+          d.promise.then(function(arg){
+            count++;
+            expect(count).to.equal(2);
+            done();
+          });
+          d.resolve();
           count++;
         });
         it('as functions (onFulfilled)', function(done){
@@ -443,6 +452,15 @@ describe('defer', function(){
       });
     });
   });
+
+  it('promise should not have resolve', function(){
+    expect(d.promise.resolve).to.not.exist;
+  });
+
+  it('promise should not have reject', function(){
+    expect(d.promise.reject).to.not.exist;
+  });
+
 });
 
 

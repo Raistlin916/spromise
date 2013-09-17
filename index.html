@@ -3,25 +3,53 @@
 <head>
 	<script src="promise.js"></script>
   <script src="q.js"></script>
+  <script src="./node_modules/chai/chai.js"></script>
 </head>
 <body>
 	<script>
-    var d = sp.defer();
-    
-    d.promise.then(function(x){
-      return {
-        then: function(res){
-          setTimeout(function(){
-            res(x);
-          }, 1000)
-          console.log(x, 1);
-        }
-      }
-    }).then(function(x){
-      console.log(x, 2);
+
+
+    function s1(){
+      var d = sp.defer();
+
+      setTimeout(function(){
+        console.log(1);
+        d.resolve(1);
+      }, 1000);
+
+      return d.promise;
+    }
+
+    function s2(){
+      var d = sp.defer();
+
+      setTimeout(function(){
+        console.log(2);
+        d.resolve(2);
+      }, 1000);
+
+      return d.promise;
+    }
+
+    function s3(){
+      var d = sp.defer();
+
+      setTimeout(function(){
+        console.log(3);
+        d.resolve(3);
+      }, 2000);
+
+      return d.promise;
+    }
+
+    var a = [s1, s2, s3];
+
+    sp.all(a).then(function(d){
+      console.log(d, 'done');
     });
 
-   
+    
+
 
   </script>
 </body>
