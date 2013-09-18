@@ -25,6 +25,7 @@
       }
       
       var cb, nx;
+
       do {
         cb = cbs[state].shift();
         nx = next.shift();
@@ -39,7 +40,7 @@
           nx[mapping[state]](store[state]);
         } else {
           r = cb(v);
-          if(r.then){
+          if(r && isFunction(r.then)){
             r.then.apply(r, mapping.map(function(name){
               return nx[name];
             }));

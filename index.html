@@ -42,15 +42,61 @@
       return d.promise;
     }
 
-    var a = [s1, s2, s3];
+    function s4(){
+      var d = sp.defer();
 
-    sp.all(a).then(function(d){
-      console.log(d, 'done');
+      setTimeout(function(){
+        console.log(4);
+        d.resolve(4);
+      }, 1000);
+
+      return d.promise;
+    }
+
+    function s5(){
+      var d = sp.defer();
+
+      setTimeout(function(){
+        console.log(5);
+        d.resolve(5);
+      }, 900);
+
+      return d.promise;
+    }
+
+    function s6(){
+      var d = sp.defer();
+
+      setTimeout(function(){
+        console.log(6);
+        d.resolve(6);
+      }, 1100);
+
+      return d.promise;
+    }
+
+
+    var a1 = [s1, s2, s3], a2 = [s4, s5, s6];
+
+    sp.waterfall(a1)
+      .then(function(){
+        return sp.all(a2)
+      })
+      .then(function(){
+        console.log('done');
+      }, function(){
+        console.log('fail');
+      }).then(function(){
+        console.log('load')
+      });
+
+    var d = sp.defer();
+    d.promise.then(function(){
+      console.log(1110);
+    }).then(function(){
+      console.log(111);
     });
-
-    
-
-
+    d.resolve();
   </script>
 </body>
 </html>

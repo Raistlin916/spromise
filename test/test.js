@@ -6,7 +6,7 @@ var expect = require('chai').expect
   , Q = require('../q')
   , rsvp = require('rsvp');
 
-var defer = sp.defer;
+var defer = Q.defer;
 
 describe('defer', function(){
   var d, count, fooObj, targetData, targetData2, e;
@@ -430,6 +430,15 @@ describe('defer', function(){
             });
           });
         });
+      });
+      it('Chained calls', function(done){
+        d.promise.then(function(){
+          expect(++count).to.equal(1);
+        }).then(function(){
+          expect(++count).to.equal(2);
+          done();
+        });
+        d.resolve();
       });
       it('error bubbling', function(done){
         d.promise.then(function(){
