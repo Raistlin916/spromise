@@ -6,7 +6,27 @@
   <script src="./node_modules/chai/chai.js"></script>
 </head>
 <body>
-	<script>
+  <script>
+    var d = sp.defer(), count = 0;
+
+
+    d.promise.then(null, null, function(d){
+      console.log(++count);
+    })
+    d.promise.then(null, null, function(d){
+      console.log(++count);
+      return 'aab';
+    }).then(null, null, function(d){
+      console.log(++count);
+    });
+
+    
+    d.notify('1232');
+    count ++;
+
+
+  </script>
+	<script type="template/text">
 
 
     function s1(){

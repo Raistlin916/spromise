@@ -1,7 +1,7 @@
 "use strict";
 
 (function(exports){
-  var mapping = ['resolve', 'reject'];
+  var mapping = ['resolve', 'reject', 'notify'];
 
   function isFunction(arg){
     return typeof(arg) == 'function';
@@ -11,21 +11,37 @@
     // state: -1 pending, 0 fulfilled, 1 rejected;
     // store[0] value, values[1] reason;
     // cbs[0] onFulfilled, cbs[1] onRejected
-    var state = -1, cbs = [[], []], store = [], next = [], runned = false;
+    var state = -1, cbs = [[], [], []], store = [], next = [], runned = false;
 
-    function honorAsync(){
+    function honor(){
       if(!runned){
-        setTimeout(honor);
+        setTimeout(honorAsync);
       }
     }
 
-    function honor(){
+    function notify(){
+      var cb, nx;
+      do {
+        cb = cbs[2].shift();
+        nx = next.shift();
+        notifyPiece(cb, nx);
+      } while (cbs[2].length);
+    }
+
+    function notifyPiece(cb, nx){
+      var r, v = store[2];
+      if(isFunction(cb)){
+        r = cb(v);
+        nx.notify(r);
+      }
+    }
+
+    function honorAsync(){
       if(!next.length){
         return;
       }
       
       var cb, nx;
-
       do {
         cb = cbs[state].shift();
         nx = next.shift();
@@ -64,7 +80,7 @@
 
             if(state > -1){
               runned = true;
-              honorAsync();
+              honor();
             }
             
             return nx;
@@ -72,18 +88,29 @@
         }
 
     mapping.forEach(function(item, i){
+      // notify
+      if(i == 2){
+        ins[item] = function(arg){
+          store[2] = arg;
+          setTimeout(function(){
+            notify(arg);
+          });
+        }
+        return ins;
+      }
+      // resolve, reject
       ins[item] = function(arg){
         if(state < 0){
           state = i;
           store[state] = arg;
-          honorAsync();
+          honor();
         }
       }
     });
     return ins;
   }
 
-  function privatize(des, prvtList){
+  function detach(des, prvtList){
     var priv = {};
     prvtList.forEach(function(k){
       priv[k] = des[k];
@@ -131,21 +158,19 @@
   var sp = {
     defer: function () {
       var promise = createPromise()
-      , priv = privatize(promise, mapping);
+      , _private = detach(promise, mapping)
+      , ins = { promise: promise };
 
-      return {
-        promise: promise,
-        resolve: function (arg) {
-          priv.resolve(arg);
-        },
-        reject: function (arg) {
-          priv.reject(arg);
+      mapping.forEach(function(k){
+        ins[k] = function(arg){
+          _private[k](arg);
         }
-      }
+      });
+
+      return ins;
     }
   }
 
   extend(sp, addition);
-
   exports.sp = sp;
 })(this['module'] ? module.exports: this);

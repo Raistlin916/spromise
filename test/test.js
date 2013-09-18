@@ -6,7 +6,7 @@ var expect = require('chai').expect
   , Q = require('../q')
   , rsvp = require('rsvp');
 
-var defer = Q.defer;
+var defer = sp.defer;
 
 describe('defer', function(){
   var d, count, fooObj, targetData, targetData2, e;
@@ -25,6 +25,14 @@ describe('defer', function(){
   });
 
   describe('promise', function(){
+
+    it('promise should not have resolve', function(){
+      expect(d.promise.resolve).to.not.exist;
+    });
+
+    it('promise should not have reject', function(){
+      expect(d.promise.reject).to.not.exist;
+    });
     
     describe('then', function(){
       describe('onFulfilled and onRejected are optional arguments', function(){
@@ -462,12 +470,31 @@ describe('defer', function(){
     });
   });
 
-  it('promise should not have resolve', function(){
-    expect(d.promise.resolve).to.not.exist;
-  });
+  
 
-  it('promise should not have reject', function(){
-    expect(d.promise.reject).to.not.exist;
+  it('notify worked', function(done){
+    d.promise.then(null, null, function(d){
+      expect(d).to.equal(targetData);
+      expect(++count).to.equal(2);
+    });
+
+    d.promise.then(null, null, function(d){
+      expect(d).to.equal(targetData);
+      expect(++count).to.equal(3);
+    });
+
+    d.promise.then(null, null, function(d){
+      expect(d).to.equal(targetData);
+    }).then(null, null, function(d){
+      expect(d).to.not.exist;
+      return targetData2;
+    }).then(null, null, function(d){
+      expect(d).to.equal(targetData2);
+      done();
+    });
+
+    d.notify(targetData);
+    count++;
   });
 
 });
