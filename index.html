@@ -2,7 +2,7 @@
 <html>
 <head>
 	<script src="promise.js"></script>
-  <script src="q.js"></script>
+  <script src="./contrast/q.js"></script>
   <script src="./node_modules/chai/chai.js"></script>
 </head>
 <body>
@@ -10,18 +10,29 @@
     var d = sp.defer(), count = 0;
 
 
-    d.promise.then(null, null, function(d){
+    d.promise.then(function(){
+      console.log('r');
+    }, null, function(d){
+      console.log(d);
       console.log(++count);
     })
     d.promise.then(null, null, function(d){
       console.log(++count);
       return 'aab';
-    }).then(null, null, function(d){
+    }).then(function(){
+      console.log('r');
+    }, null, function(d){
       console.log(++count);
+
+    }).fail(function(){
+      console.log(123);
     });
 
     
+    
     d.notify('1232');
+    d.resolve();
+
     count ++;
 
 

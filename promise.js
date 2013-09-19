@@ -20,23 +20,18 @@
     }
 
     function notify(){
-      var cb, nx;
+      var cb, nx, n = 0;
       do {
         cb = cbs[2].shift();
-        nx = next.shift();
-        notifyPiece(cb, nx);
+        nx = next[n++];
+        if(isFunction(cb)){
+          nx.notify(cb(store[2]));
+        }
       } while (cbs[2].length);
     }
 
-    function notifyPiece(cb, nx){
-      var r, v = store[2];
-      if(isFunction(cb)){
-        r = cb(v);
-        nx.notify(r);
-      }
-    }
-
     function honorAsync(){
+
       if(!next.length){
         return;
       }
@@ -73,37 +68,36 @@
           then: function () {
             var args = arguments, nx = createPromise();
             next.push(nx);
-
             mapping.forEach(function(name, i){
               cbs[i].push(args[i]);
             });
-
             if(state > -1){
               runned = true;
               honor();
             }
-            
             return nx;
+          },
+          progress: function(fn){
+            this.then(null, null, fn);
+          },
+          fail: function(fn){
+            this.then(null, fn);
           }
         }
 
     mapping.forEach(function(item, i){
-      // notify
-      if(i == 2){
-        ins[item] = function(arg){
-          store[2] = arg;
-          setTimeout(function(){
-            notify(arg);
-          });
-        }
-        return ins;
-      }
-      // resolve, reject
       ins[item] = function(arg){
         if(state < 0){
-          state = i;
-          store[state] = arg;
-          honor();
+          store[i] = arg;
+          if(i == 2){
+            setTimeout(function(){
+              notify(arg);
+            });
+            return ins;
+          } else {
+            state = i;
+            honor();
+          }
         }
       }
     });

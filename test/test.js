@@ -1,10 +1,9 @@
 "use strict";
 var expect = require('chai').expect
   , sp = require('../promise').sp
-  , Deferred = require('../_deferred').Deferred
-  , when = require('../when')
-  , Q = require('../q')
-  , rsvp = require('rsvp');
+  , Deferred = require('../contrast/_deferred').Deferred
+  , when = require('../contrast/when')
+  , Q = require('../contrast/q');
 
 var defer = sp.defer;
 
@@ -473,12 +472,14 @@ describe('defer', function(){
   
 
   it('notify worked', function(done){
-    d.promise.then(null, null, function(d){
+    d.promise.then(function(){
+      done();
+    }, null, function(d){
       expect(d).to.equal(targetData);
       expect(++count).to.equal(2);
     });
 
-    d.promise.then(null, null, function(d){
+    /*d.promise.then(null, null, function(d){
       expect(d).to.equal(targetData);
       expect(++count).to.equal(3);
     });
@@ -490,11 +491,21 @@ describe('defer', function(){
       return targetData2;
     }).then(null, null, function(d){
       expect(d).to.equal(targetData2);
-      done();
-    });
+    });*/
 
     d.notify(targetData);
+    d.resolve();
     count++;
+  });
+
+  it('notify after resolve wont work', function(done){
+    d.promise.then(function(){
+      done();
+    }, null, function(){
+      done();
+    });
+    d.resolve();
+    d.notify();
   });
 
 });
