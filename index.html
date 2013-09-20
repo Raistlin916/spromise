@@ -6,128 +6,37 @@
   <script src="./node_modules/chai/chai.js"></script>
 </head>
 <body>
-  <script>
-    var d = sp.defer(), count = 0;
-
-
-    d.promise.then(function(){
-      console.log('r');
-    }, null, function(d){
-      console.log(d);
-      console.log(++count);
-    })
-    d.promise.then(null, null, function(d){
-      console.log(++count);
-      return 'aab';
-    }).then(function(){
-      console.log('r');
-    }, null, function(d){
-      console.log(++count);
-
-    }).fail(function(){
-      console.log(123);
-    });
-
-    
-    
-    d.notify('1232');
-    d.resolve();
-
-    count ++;
-
-
-  </script>
-	<script type="template/text">
-
+	<script>
+    var defer = sp.defer;
 
     function s1(){
-      var d = sp.defer();
+      var d = defer();
 
       setTimeout(function(){
-        console.log(1);
-        d.resolve(1);
-      }, 1000);
+        d.notify('av');
+        d.resolve(123);
 
+      }, 1000);
       return d.promise;
     }
 
     function s2(){
-      var d = sp.defer();
-
+      var d = defer();
       setTimeout(function(){
-        console.log(2);
-        d.resolve(2);
+        d.reject(111);
+        d.resolve(222);
       }, 1000);
-
       return d.promise;
     }
 
-    function s3(){
-      var d = sp.defer();
-
-      setTimeout(function(){
-        console.log(3);
-        d.resolve(3);
-      }, 2000);
-
-      return d.promise;
-    }
-
-    function s4(){
-      var d = sp.defer();
-
-      setTimeout(function(){
-        console.log(4);
-        d.resolve(4);
-      }, 1000);
-
-      return d.promise;
-    }
-
-    function s5(){
-      var d = sp.defer();
-
-      setTimeout(function(){
-        console.log(5);
-        d.resolve(5);
-      }, 900);
-
-      return d.promise;
-    }
-
-    function s6(){
-      var d = sp.defer();
-
-      setTimeout(function(){
-        console.log(6);
-        d.resolve(6);
-      }, 1100);
-
-      return d.promise;
-    }
-
-
-    var a1 = [s1, s2, s3], a2 = [s4, s5, s6];
-
-    sp.waterfall(a1)
-      .then(function(){
-        return sp.all(a2)
-      })
-      .then(function(){
-        console.log('done');
-      }, function(){
-        console.log('fail');
-      }).then(function(){
-        console.log('load')
-      });
-
-    var d = sp.defer();
-    d.promise.then(function(){
-      console.log(1110);
-    }).then(function(){
-      console.log(111);
+    sp.all([s1, s2]).then(function(d){
+      console.log(d);
+    }).fail(function(d){
+      console.log(d);
+    }).progress(function(n){
+      console.log(n);
     });
-    d.resolve();
+
   </script>
 </body>
 </html>

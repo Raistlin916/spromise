@@ -20,14 +20,15 @@
     }
 
     function notify(){
-      var cb, nx, n = 0;
-      do {
-        cb = cbs[2].shift();
-        nx = next[n++];
+      var cb, nx;
+      cbs[2].forEach(function(cb, i){
+        nx = next[i];
         if(isFunction(cb)){
           nx.notify(cb(store[2]));
+        } else {
+          nx.notify(store[2]);
         }
-      } while (cbs[2].length);
+      });
     }
 
     function honorAsync(){
@@ -79,9 +80,11 @@
           },
           progress: function(fn){
             this.then(null, null, fn);
+            return this;
           },
           fail: function(fn){
             this.then(null, fn);
+            return this;
           }
         }
 
@@ -90,9 +93,9 @@
         if(state < 0){
           store[i] = arg;
           if(i == 2){
-            setTimeout(function(){
-              notify(arg);
-            });
+          //  setTimeout(function(){
+            notify(arg);
+          //  });
             return ins;
           } else {
             state = i;
@@ -125,10 +128,10 @@
   }
 
   var addition = {
-    call: function(data){
+    call: function(fn){
       var d = this.defer();
-      d.resolve(data);
-      return d.promise;
+      d.resolve();
+      return d.promise.then(fn);
     },
     waterfall: function(ps){
       return ps.reduce(function(n, u){
@@ -137,14 +140,23 @@
     },
     all: function(ps){
       var l = ps.length, results = [], d = this.defer();
-      ps.forEach(function(p, n){
-        p().then(function(r){
-          results[n] = r;
-          if(!--l) {
-            d.resolve(results);
-          }
+      try {
+        ps.forEach(function(p, n){
+          p().then(function(r){
+            results[n] = r;
+            if(!--l) {
+              d.resolve(results);
+            }
+          }, function(r){
+            d.reject(r);
+          }, function(n){
+            d.notify(n);
+          });
         });
-      });
+      } catch(e){
+        d.reject(e);
+      }
+      
       return d.promise;
     }
   }

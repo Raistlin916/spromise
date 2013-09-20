@@ -479,7 +479,7 @@ describe('defer', function(){
       expect(++count).to.equal(2);
     });
 
-    /*d.promise.then(null, null, function(d){
+    d.promise.then(null, null, function(d){
       expect(d).to.equal(targetData);
       expect(++count).to.equal(3);
     });
@@ -491,7 +491,7 @@ describe('defer', function(){
       return targetData2;
     }).then(null, null, function(d){
       expect(d).to.equal(targetData2);
-    });*/
+    });
 
     d.notify(targetData);
     d.resolve();
@@ -506,6 +506,38 @@ describe('defer', function(){
     });
     d.resolve();
     d.notify();
+  });
+
+  it('notify work', function(done){
+
+    d.promise.then(function(){
+      
+    }).progress(function(d){
+      done();
+      expect(d).to.equal(targetData);
+    });
+
+    d.notify(targetData);
+    d.resolve();
+  });
+
+  it('notify twice, call progress twice in order', function(done){
+
+    d.promise.then(function(){
+
+    }).then().progress(function(d){
+      count ++;
+      if(count == 1){
+        expect(d).to.equal(targetData);
+      }
+      if(count == 2){
+        expect(d).to.equal(targetData2);
+        done();
+      }
+    });
+    
+    d.notify(targetData);
+    d.notify(targetData2);
   });
 
 });
