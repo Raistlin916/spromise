@@ -142,7 +142,7 @@
       var l = ps.length, results = [], d = this.defer();
       try {
         ps.forEach(function(p, n){
-          p().then(function(r){
+          p.then(function(r){
             results[n] = r;
             if(!--l) {
               d.resolve(results);

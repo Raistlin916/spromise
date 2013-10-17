@@ -3,7 +3,6 @@
 <head>
 	<script src="promise.js"></script>
   <script src="./contrast/q.js"></script>
-  <script src="./node_modules/chai/chai.js"></script>
 </head>
 <body>
 	<script>
@@ -13,7 +12,7 @@
       var d = defer();
 
       setTimeout(function(){
-        d.notify('av');
+        d.notify('a');
         d.resolve(123);
 
       }, 1000);
@@ -29,7 +28,7 @@
       return d.promise;
     }
 
-    sp.all([s1, s2]).then(function(d){
+    sp.all([s1(), s2()]).then(function(d){
       console.log(d);
     }).fail(function(d){
       console.log(d);
