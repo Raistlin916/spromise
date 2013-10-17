@@ -4,7 +4,7 @@
 
 ### 用法
 
-  var defer = sp.defer;
+    var defer = sp.defer;
 
     function s1(){
       var d = defer();
